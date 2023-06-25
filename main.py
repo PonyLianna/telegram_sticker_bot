@@ -65,14 +65,15 @@ async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
 
     sticker_set_name = callback.replace(f"/{config['commands']['get_set']}", "").strip()
-    sticker_set = str(await update.get_bot().get_sticker_set(sticker_set_name))
+    sticker_set = await update.get_bot().get_sticker_set(sticker_set_name)
+    sticker_set_str = str(sticker_set)
 
     file_name = f"{sticker_set_name}_telegram_sticker.txt"
     with open(file_name, "w", encoding="utf-8") as my_file:
-        my_file.write(sticker_set)
+        my_file.write(sticker_set_str)
 
     my_file = open(file_name, "rb")
-    await update.get_bot().send_document(chat_id= update.effective_message.chat_id, document=my_file)
+    await update.get_bot().send_document(chat_id=update.effective_message.chat_id, document=my_file)
     await update.callback_query.answer()
     my_file.close()
     os.remove(file_name)
