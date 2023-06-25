@@ -50,8 +50,8 @@ async def sticker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     inline_keyboard = [[InlineKeyboardButton(text=sticker_set_name, callback_data=command)]]
     markup = InlineKeyboardMarkup(inline_keyboard)
 
-    await update.message.reply_markdown("*File id:* `" + sticker.file_id + "`")#(f"FILE_ID: `{sticker.file_id}`")
-    await update.message.reply_markdown("*File Unique id:* `" + sticker.file_unique_id + "`")#(f"FILE_UNIQUE_ID: `{sticker.file_unique_id}`")
+    await update.message.reply_markdown("*File id:* `" + sticker.file_id + "`")
+    await update.message.reply_markdown("*File Unique id:* `" + sticker.file_unique_id + "`")
     await update.message.reply_text(sticker_str, reply_markup=markup)
 
 
