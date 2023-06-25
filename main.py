@@ -50,8 +50,8 @@ async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     sticker_set = str(await update.get_bot().get_sticker_set(sticker_set_name))
 
     file_name = f"{sticker_set_name}_telegram_sticker.txt"
-    with open(file_name, "rb+") as my_file:
-        my_file.write(bytearray(sticker_set, encoding="utf-8"))
+    with open(file_name, "w", encoding="utf-8") as my_file:
+        my_file.write(sticker_set)
 
     my_file = open(file_name, "rb")
     await update.message.reply_document(my_file)
