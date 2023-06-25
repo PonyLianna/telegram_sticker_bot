@@ -5,7 +5,7 @@
 import logging
 import os
 
-from telegram import __version__ as TG_VER
+from telegram import __version__ as TG_VER, InlineKeyboardMarkup, InlineKeyboardButton
 
 try:
     from telegram import __version_info__
@@ -18,7 +18,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import Application, ContextTypes, MessageHandler, filters, InlineQueryHandler, CallbackQueryHandler
 import yaml
 
 with open('./config.yaml') as f:
@@ -41,12 +41,28 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def sticker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    sticker = str(update.effective_message.effective_attachment)
-    await update.message.reply_text(sticker)
+    sticker = update.effective_message.effective_attachment
+    sticker_str = str(sticker)
+
+    sticker_set_name = sticker.set_name
+    command = f"/{config['commands']['get_set']} {sticker_set_name}"
+
+    inline_keyboard = [[InlineKeyboardButton(text=sticker_set_name, callback_data=command)]]
+    markup = InlineKeyboardMarkup(inline_keyboard)
+
+    await update.message.reply_text(sticker_str, reply_markup=markup)
 
 
 async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    sticker_set_name = update.message.text.replace(f"/{config['commands']['get_set']}", "").strip()
+    callback = update.callback_query.data
+
+    if not callback:  # empty query should not be handled
+        return
+
+    if f"/{config['commands']['get_set']}" not in callback:
+        return
+
+    sticker_set_name = callback.replace(f"/{config['commands']['get_set']}", "").strip()
     sticker_set = str(await update.get_bot().get_sticker_set(sticker_set_name))
 
     file_name = f"{sticker_set_name}_telegram_sticker.txt"
@@ -54,9 +70,9 @@ async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         my_file.write(sticker_set)
 
     my_file = open(file_name, "rb")
-    await update.message.reply_document(my_file)
+    await update.get_bot().send_document(chat_id= update.effective_message.chat_id, document=my_file)
+    await update.callback_query.answer()
     my_file.close()
-
     os.remove(file_name)
 
 
@@ -68,10 +84,10 @@ def main() -> None:
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
     application.add_handler(MessageHandler(filters.ATTACHMENT, sticker))
-    application.add_handler(CommandHandler(config["commands"]["get_set"], get_set))
+    application.add_handler(CallbackQueryHandler(get_set))
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
