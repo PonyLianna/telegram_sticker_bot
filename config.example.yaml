@@ -1,0 +1,4 @@
+bot:
+  token: ""
+commands:
+  get_set: "get_set"
