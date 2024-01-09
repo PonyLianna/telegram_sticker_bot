@@ -18,10 +18,17 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters, CallbackQueryHandler, CommandHandler
+from telegram.ext import (
+    Application,
+    ContextTypes,
+    MessageHandler,
+    filters,
+    CallbackQueryHandler,
+    CommandHandler,
+)
 import yaml
 
-with open('./config.yaml') as f:
+with open("./config.yaml") as f:
     config = yaml.load(f, Loader=yaml.SafeLoader)
 
 # Enable logging
@@ -51,11 +58,15 @@ async def sticker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     sticker_set_name = sticker.set_name
     command = f"/{config['commands']['get_set']} {sticker_set_name}"
 
-    inline_keyboard = [[InlineKeyboardButton(text=sticker_set_name, callback_data=command)]]
+    inline_keyboard = [
+        [InlineKeyboardButton(text=sticker_set_name, callback_data=command)]
+    ]
     markup = InlineKeyboardMarkup(inline_keyboard)
 
     await update.message.reply_markdown("*File id:* `" + sticker.file_id + "`")
-    await update.message.reply_markdown("*File Unique id:* `" + sticker.file_unique_id + "`")
+    await update.message.reply_markdown(
+        "*File Unique id:* `" + sticker.file_unique_id + "`"
+    )
     await update.message.reply_text(sticker_str, reply_markup=markup)
 
 
@@ -77,7 +88,9 @@ async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         my_file.write(sticker_set_str)
 
     my_file = open(file_name, "rb")
-    await update.get_bot().send_document(chat_id=update.effective_message.chat_id, document=my_file)
+    await update.get_bot().send_document(
+        chat_id=update.effective_message.chat_id, document=my_file
+    )
     await update.callback_query.answer()
     my_file.close()
     os.remove(file_name)
