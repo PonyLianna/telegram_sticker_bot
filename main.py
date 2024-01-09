@@ -18,7 +18,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
         f"visit https://docs.python-telegram-bot.org/en/v{TG_VER}/examples.html"
     )
 from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters, CallbackQueryHandler
+from telegram.ext import Application, ContextTypes, MessageHandler, filters, CallbackQueryHandler, CommandHandler
 import yaml
 
 with open('./config.yaml') as f:
@@ -38,6 +38,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     Echo the user message.
     """
     await update.message.reply_text(update.message.text)
+
+
+async def user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(update.message.from_user)
 
 
 async def sticker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -88,6 +92,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
     application.add_handler(MessageHandler(filters.ATTACHMENT, sticker))
     application.add_handler(CallbackQueryHandler(get_set))
+    application.add_handler(CommandHandler(config["commands"]["user_info"], user_info))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
