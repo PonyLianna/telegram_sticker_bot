@@ -3,3 +3,4 @@ bot:
 commands:
   get_set: "get_set"
   user_info: "me"
+  start: "start"

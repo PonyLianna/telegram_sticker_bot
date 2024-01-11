@@ -47,6 +47,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(update.message.text)
 
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("Добро пожаловать! Можете прислать стикер или выполнить команду /me")
+
+
 async def user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(update.message.from_user)
 
@@ -106,6 +110,7 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.ATTACHMENT, sticker))
     application.add_handler(CallbackQueryHandler(get_set))
     application.add_handler(CommandHandler(config["commands"]["user_info"], user_info))
+    application.add_handler(CommandHandler(config["commands"]["start"], start))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
