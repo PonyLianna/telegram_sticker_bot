@@ -2,5 +2,6 @@ bot:
   token: ""
 commands:
   get_set: "get_set"
+  get_set_images: "get_set_images"
   user_info: "me"
   start: "start"

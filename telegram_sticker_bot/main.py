@@ -6,7 +6,14 @@ import logging
 
 from telegram import __version__ as TG_VER, InlineKeyboardMarkup, InlineKeyboardButton
 
-from telegram_sticker_bot.commands import echo, get_set, start, sticker, user_info
+from telegram_sticker_bot.commands import (
+    echo,
+    get_set,
+    get_set_w_images,
+    start,
+    sticker,
+    user_info,
+)
 from telegram_sticker_bot.config import Configuration
 
 try:
@@ -46,7 +53,13 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
     application.add_handler(MessageHandler(filters.ATTACHMENT, sticker))
 
-    application.add_handler(CallbackQueryHandler(get_set))
+    application.add_handler(
+        CallbackQueryHandler(pattern=r"^/get_set .*", callback=get_set)
+    )
+    application.add_handler(
+        CallbackQueryHandler(pattern=r"^/get_set_images .*", callback=get_set_w_images)
+    )
+
     application.add_handler(CommandHandler(config["commands"]["user_info"], user_info))
     application.add_handler(CommandHandler(config["commands"]["start"], start))
 
