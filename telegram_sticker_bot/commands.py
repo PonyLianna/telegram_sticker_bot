@@ -1,6 +1,9 @@
 import io
-import os
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaDocument
+from telegram import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    InputMediaPhoto,
+)
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -52,7 +55,7 @@ async def get_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not callback:  # empty query should not be handled
         return
 
-    if f"/{config['commands']['get_set']}" not in callback:
+    if not callback.startswith(f"/{config['commands']['get_set']}"):
         return
 
     sticker_set_name = callback.replace(f"/{config['commands']['get_set']}", "").strip()
