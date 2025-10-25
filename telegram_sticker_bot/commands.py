@@ -19,9 +19,13 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "Добро пожаловать! Можете прислать стикер или выполнить команду /me"
-    )
+    config = Configuration().data
+    await update.message.reply_text(config["text"]["start"])
+
+
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    config = Configuration().data
+    await update.message.reply_text(config["text"]["help"])
 
 
 async def user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

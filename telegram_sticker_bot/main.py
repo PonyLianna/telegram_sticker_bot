@@ -13,6 +13,7 @@ from telegram_sticker_bot.commands import (
     start,
     sticker,
     user_info,
+    help,
 )
 from telegram_sticker_bot.config import Configuration
 
@@ -62,6 +63,7 @@ def main() -> None:
 
     application.add_handler(CommandHandler(config["commands"]["user_info"], user_info))
     application.add_handler(CommandHandler(config["commands"]["start"], start))
+    application.add_handler(CommandHandler(config["commands"]["help"], help))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)

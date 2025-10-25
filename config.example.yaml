@@ -1,7 +1,13 @@
 bot:
   token: ""
+
 commands:
   get_set: "get_set"
   get_set_images: "get_set_images"
   user_info: "me"
   start: "start"
+  help: "help"
+
+text:
+  start: "Welcome! Send me a sticker or execute `/me`"
+  help: "Available commands: /me, /start"
