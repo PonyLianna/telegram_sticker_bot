@@ -6,8 +6,9 @@ from telegram import (
 )
 from telegram import Update
 from telegram.ext import ContextTypes
-from PIL import Image
+
 from telegram_sticker_bot.config import Configuration
+from telegram_sticker_bot.helpers import chunkify, webp_to_png
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -95,15 +96,8 @@ async def get_set_w_images(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     sticker_set_name = callback.replace(
         f"/{config['commands']['get_set_images']}", ""
     ).strip()
-    sticker_set = await update.get_bot().get_sticker_set(sticker_set_name)
 
-    def webp_to_png(webp_bytes: bytearray) -> bytes:
-        image = Image.open(io.BytesIO(webp_bytes))
-        output = io.BytesIO()
-        image.save(output, format="PNG")
-        output.seek(0)
-        output.name = "test"
-        return output
+    sticker_set = await update.get_bot().get_sticker_set(sticker_set_name)
 
     images_paths = [(await i.get_file()) for i in sticker_set.stickers]
     images = [await i.download_as_bytearray() for i in images_paths]
@@ -116,19 +110,9 @@ async def get_set_w_images(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     file_bytes = io.BytesIO(sticker_set_str.encode("utf-8"))
     file_bytes.name = f"{sticker_set_name}_telegram_sticker.txt"
 
-    # await update.get_bot().send_document(
-    #     chat_id=update.effective_message.chat_id, document=file_bytes
-    # )
-
-    def chunkify(lst, size):
-        return [lst[i : i + size] for i in range(0, len(lst), size)]
-
     for group in chunkify(test_images, 10):
         await update.get_bot().send_media_group(
             chat_id=update.effective_message.chat_id, media=group
         )
-    # await update.get_bot().send_media_group(
-    #     chat_id=update.effective_message.chat_id, media=[test_images[0], test_images[0]]
-    # )
 
     await update.callback_query.answer()
