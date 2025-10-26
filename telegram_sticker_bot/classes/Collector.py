@@ -1,38 +1,45 @@
 from typing import List
-
-from telegram import File
-
+from telegram_sticker_bot.classes.BytesName import BytesName
 from telegram_sticker_bot.helpers import convert_webm_bytes_to_mp4_bytes, webp_to_bytes
 
 
 class Collector:
-    def __init__(self, webp: List["File"], webm: List["File"]):
-        self._webp: List["File"] = webp
-        self._webm: List["File"] = webm
+    def __init__(self, images_lst: List["BytesName"], video_lst: List["BytesName"]):
+        self._images_lst: List["BytesName"] = images_lst
+        self._video_lst: List["BytesName"] = video_lst
 
-    async def webp_to(self, format="PNG") -> List[bytes]:
-        return [webp_to_bytes(await i.download_as_bytearray(), format) for i in self._webp]
+    def webp_to(self, format="PNG") -> List[BytesName]:
+        if self.images_not_empty:
+            return [
+                BytesName(content=webp_to_bytes(i.content, format), name=i.name)
+                for i in self._images_lst
+            ]
+        else:
+            return []
 
-    async def webm_to_mp4(self) -> List[bytes]:
-        return [convert_webm_bytes_to_mp4_bytes(await i.download_as_bytearray()) for i in self._webm]
+    def webm_to_mp4(self) -> List[BytesName]:
+        if self.videos_not_empty:
+            return [
+                BytesName(
+                    content=convert_webm_bytes_to_mp4_bytes(i.content), name=i.name
+                )
+                for i in self._video_lst
+            ]
+        else:
+            return []
 
     @property
-    def webp(self):
-        return self._webp
+    def images(self):
+        return self._images_lst
 
     @property
-    def webm(self):
-        return self._webm
+    def images_not_empty(self):
+        return len(self._images_lst) > 0
 
-    @classmethod
-    def collect_and_filter(cls, str_lst: List["File"]):
-        webp_files: List["File"] = []
-        webm_files: List["File"] = []
+    @property
+    def videos(self):
+        return self._video_lst
 
-        for i in str_lst:
-            if i.file_path.endswith(".webp"):
-                webp_files.append(i)
-            elif i.file_path.endswith(".webm"):
-                webm_files.append(i)
-
-        return cls(webp=webp_files, webm=webm_files)
+    @property
+    def videos_not_empty(self):
+        return len(self._video_lst) > 0
