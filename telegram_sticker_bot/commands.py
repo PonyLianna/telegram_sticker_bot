@@ -7,8 +7,10 @@ from telegram import (
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from telegram_sticker_bot.classes.Collector import Collector
 from telegram_sticker_bot.config import Configuration
-from telegram_sticker_bot.helpers import chunkify, webp_to_png
+
+from telegram_sticker_bot.helpers import chunkify, webp_to_bytes
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -99,18 +101,12 @@ async def get_set_w_images(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     sticker_set = await update.get_bot().get_sticker_set(sticker_set_name)
 
-    images_paths = [(await i.get_file()) for i in sticker_set.stickers]
-    images = [await i.download_as_bytearray() for i in images_paths]
-    images_png = [webp_to_png(i) for i in images]
+    stickers_paths = [(await i.get_file()) for i in sticker_set.stickers]
+    collector = Collector.collect_and_filter(stickers_paths)
 
-    test_images = [InputMediaPhoto(media=bytess) for bytess in images_png]
+    stickers_images = [InputMediaPhoto(media=bytess) for bytess in await collector.webp_to()]
 
-    sticker_set_str = str(sticker_set)
-
-    file_bytes = io.BytesIO(sticker_set_str.encode("utf-8"))
-    file_bytes.name = f"{sticker_set_name}_telegram_sticker.txt"
-
-    for group in chunkify(test_images, 10):
+    for group in chunkify(stickers_images, 10):
         await update.get_bot().send_media_group(
             chat_id=update.effective_message.chat_id, media=group
         )
