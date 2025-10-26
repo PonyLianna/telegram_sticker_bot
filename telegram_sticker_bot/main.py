@@ -4,17 +4,10 @@
 
 import logging
 
-from telegram import __version__ as TG_VER, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import __version__ as TG_VER
 
-from telegram_sticker_bot.commands import (
-    echo,
-    get_set,
-    get_set_w_images,
-    start,
-    sticker,
-    user_info,
-    help,
-)
+from telegram_sticker_bot.commands.callbacks import get_set, get_set_w_images
+from telegram_sticker_bot.commands.commands import echo, start, sticker, user_info
 from telegram_sticker_bot.config import Configuration
 
 try:
