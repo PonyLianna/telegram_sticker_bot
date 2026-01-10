@@ -1,0 +1,26 @@
+[project]
+name = "telegram-sticker-bot"
+version = "0.1.0"
+description = ""
+authors = [{ name = "Lina", email = "knocker767@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "python-telegram-bot (>=22.5,<23.0)",
+    "pillow (>=12.0.0,<13.0.0)",
+    "ffmpeg-python (>=0.2.0,<0.3.0)",
+    "poethepoet (>=0.37.0,<0.38.0)",
+]
+
+[tool.poe.tasks]
+start = "poetry run python telegram_sticker_bot/main.py"
+format = "ruff format ."
+lint = "ruff check ."
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = ["ruff (>=0.14.2,<0.15.0)"]
